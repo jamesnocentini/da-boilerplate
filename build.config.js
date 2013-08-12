@@ -22,7 +22,7 @@ module.exports = {
      * unit tests.
      */
     src_files: {
-        js: ['src/**/*.js'],
+        js: ['src/**/*.js', '!src/**/*.spec.js'],
         jsunit: [ 'src/**/*.spec.js' ],
 
         atpl: [ 'src/app/**/*.tpl.html' ],
@@ -50,7 +50,8 @@ module.exports = {
     vendor_files: {
         js: [
             'vendor/angular/angular.js',
-            'vendor/d3/d3.min.js'
+            'vendor/d3/d3.min.js',
+            'vendor/angular-ui-router/release/angular-ui-router.js'
         ],
         css: [
         ]

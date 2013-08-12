@@ -1,10 +1,16 @@
 angular.module('da-admin', [
+        'ui.state'
 ])
 
-.config(function config($routeProvider) {
-    $routeProvider.when('/admin', {
-        templateUrl: 'admin/admin.tpl.html',
-        controller: 'AdminCtrl'
+.config(function config( $stateProvider ) {
+    $stateProvider.state('admin', {
+        url: '/admin',
+        views: {
+            main: {
+                templateUrl: 'admin/admin.tpl.html',
+                controller: 'AdminCtrl'
+            }
+        }
     });
 })
 

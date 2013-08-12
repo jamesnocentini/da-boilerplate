@@ -6,6 +6,7 @@
  * specified, as shown below.
  */
 angular.module('da-about', [
+        'ui.state',
         'da-directive-hello'
 ])
 /**
@@ -13,10 +14,15 @@ angular.module('da-about', [
  * AngularJS will ensure they are all available at run-time, but
  * splitting it this way makes each module more 'self-contained'.
  */
-.config(function config($routeProvider) {
-    $routeProvider.when('/about', {
-        templateUrl: 'about/about.tpl.html',
-        controller: 'AboutCtrl'
+.config(function config( $stateProvider ) {
+    $stateProvider.state('about', {
+        url: '/about',
+        views: {
+            "main": {
+                controller: 'AboutCtrl',
+                templateUrl: 'about/about.tpl.html'
+            }
+        }
     });
 })
 /**

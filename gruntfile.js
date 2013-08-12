@@ -34,6 +34,26 @@ module.exports = function(grunt) {
                         expand: true
                     }
                 ]
+            },
+            dev_assets: {
+                files: [
+                    {
+                        src: [ '**' ],
+                        dest: '<%= dev_dir %>/assets',
+                        cwd: 'src/assets',
+                        expand: true
+                    }
+                ]
+            },
+            dist_assets: {
+                files: [
+                    {
+                        src: [ '**' ],
+                        dest: '<%= dist_dir %>/assets',
+                        cwd: '<%= dev_dir %>/assets',
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -84,7 +104,30 @@ module.exports = function(grunt) {
                 files: [
                     '<%= src_files.js %>'
                 ],
-                tasks: ['copy:dev_appjs']
+                tasks: ['karma:unit:run', 'copy:dev_appjs']
+            },
+            /**
+             * When a JavaScript unit test file changes, we only want to run the unit tests.
+             * We don't want to do any live reload.
+             */
+            jsunit: {
+                files: [
+                    '<%= src_files.jsunit %>'
+                ],
+                tasks: ['karma:unit:run'],
+                options: {
+                    livereload: false
+                }
+            },
+            /**
+             * When assets are changed, copy them. Note that will *not* copy new files,
+             * so this is probably not very useful.
+             */
+            assets: {
+                files: [
+                    'src/assets/**/*'
+                ],
+                tasks: [ 'copy:dev_assets' ]
             }
         },
 
@@ -137,6 +180,38 @@ module.exports = function(grunt) {
                 },
                 src: [ '<%= src_files.ctpl %>' ],
                 dest: '<%= dev_dir %>/templates-common.js'
+            }
+        },
+
+        /**
+         * The Karma configuration
+         */
+        karma: {
+            options: {
+                configFile: '<%= dev_dir %>/karma-unit.js'
+            },
+            unit: {
+                runnerPort: 9101,
+                background: true
+            },
+            continuous: {
+                singleRun: true
+            }
+        },
+
+        /**
+         * This task compiles the karma template so that changes to its file array
+         * don't have to be managed manually.
+         */
+        karmaconfig: {
+            unit: {
+                dir: '<%= dev_dir %>',
+                src: [
+                    '<%= vendor_files.js %>',
+                    '<%= html2js.app.dest %>',
+                    '<%= html2js.common.dest %>',
+                    'vendor/angular-mocks/angular-mocks.js'
+                ]
             }
         },
 
@@ -258,11 +333,11 @@ module.exports = function(grunt) {
      * The 'build' task gets your app ready to run for development and testing
      */
     grunt.registerTask('build', [
-        'clean', 'html2js', 'copy:dev_appjs', 'copy:dev_vendorjs', 'compass:dev', 'index:dev'
+        'clean', 'html2js', 'copy:dev_appjs', 'copy:dev_vendorjs', 'copy:dev_assets', 'compass:dev', 'index:dev', 'karmaconfig'
     ]);
 
     grunt.registerTask('compile', [
-    'compass:compile', 'ngmin', 'concat', 'uglify', 'index:dist'
+        'compass:compile', 'ngmin', 'concat', 'uglify', 'index:dist', 'copy:dist_assets'
     ]);
 
     /**
@@ -305,6 +380,26 @@ module.exports = function(grunt) {
                         styles: cssFiles,
                         scripts: jsFiles,
                         version: grunt.config( 'pkg.version' )
+                    }
+                });
+            }
+        });
+    });
+
+
+    /**
+     * In order to avoid having to specify manually the files needed for karma to run,
+     * we use grunt to manage the list for us. The 'karma/*' files are compiled
+     * as grunt templates for use by Karma
+     */
+    grunt.registerMultiTask('karmaconfig', 'Process karma config templates', function() {
+        var jsFiles = filterForJS( this.filesSrc );
+
+        grunt.file.copy('karma/karma-unit.tpl.js', grunt.config('dev_dir') + '/karma-unit.js', {
+            process: function(contents, path) {
+                return grunt.template.process(contents, {
+                    data: {
+                        scripts: jsFiles
                     }
                 });
             }

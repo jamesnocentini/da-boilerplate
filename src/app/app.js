@@ -5,14 +5,16 @@
  */
 angular.module( 'main', [
         'templates-app',
+        'templates-common',
         'da-about',
         'da-users',
         'da-admin',
-        'templates-common'
+        'ui.state',
+        'ui.router'
     ])
 
-    .config( function myAppConfig ( ) {
-
+    .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
+        $urlRouterProvider.otherwise( '/admin' );
     })
 
     .run( function run (  ) {
@@ -24,7 +26,7 @@ angular.module( 'main', [
         d3.select('body')
             .append('h1')
             .text('Hey Thet')
-            .style('color', 'red')
+            .style('color', 'red');
 
     })
 ;

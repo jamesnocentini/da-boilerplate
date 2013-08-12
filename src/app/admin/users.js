@@ -6,16 +6,22 @@
  * specified, as shown below.
  */
 angular.module('da-users', [
+        'ui.state'
     ])
 /**
  * Each section or module of the site can also have its own routes.
  * AngularJS will ensure they are all available at run-time, but
  * splitting it this way makes each module more 'self-contained'.
  */
-    .config(function config($routeProvider) {
-        $routeProvider.when('/users', {
-            templateUrl: 'admin/users.tpl.html',
-            controller: 'UsersCtrl'
+    .config(function config( $stateProvider ) {
+        $stateProvider.state('users', {
+            url: '/users',
+            views: {
+                main: {
+                    templateUrl: 'admin/users.tpl.html',
+                    controller: 'UsersCtrl'
+                }
+            }
         });
     })
 /**
